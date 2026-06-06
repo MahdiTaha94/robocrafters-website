@@ -4,50 +4,62 @@
    HEADER BACKGROUND ON SCROLL
 ========================= */
 window.addEventListener("scroll", () => {
-  const scroll = window.scrollY;
+    const header = document.querySelector("header");
+    const caption = document.querySelector(".caption");
 
-  const headerText = document.querySelector(".header-text");
-  const header = document.querySelector("header");
+    if (!header || !caption) return;
 
-  if (!header || !headerText) return;
+    const triggerPoint = caption.offsetTop;
 
-  const triggerPoint = headerText.offsetHeight - header.offsetHeight;
-
-  header.classList.toggle("background-header", scroll >= triggerPoint);
+    if (window.scrollY > triggerPoint) {
+        header.classList.add("background-header");
+    } else {
+        header.classList.remove("background-header");
+    }
 });
-
 
 /* =========================
    ISOTOPE FILTER (still library-based)
-========================= */
+========================= 
 window.addEventListener("load", () => {
-  const grid = document.querySelector(".grid");
 
-  if (grid && window.Isotope) {
-    const iso = new Isotope(grid, {
-      itemSelector: ".all",
-      percentPosition: true,
-      masonry: {
-        columnWidth: ".all"
-      }
+  const grid = document.querySelector(".section.our-facts");
+
+  if (!grid || !window.Isotope) return;
+
+  const iso = new Isotope(grid, {
+    itemSelector: ".all",
+    percentPosition: true,
+    masonry: {
+      columnWidth: ".right-contents"
+    }
+  });
+
+  const filters = document.querySelectorAll(".filters ul li");
+
+  filters.forEach((item) => {
+    item.addEventListener("click", () => {
+
+      // remove active class from all buttons
+      filters.forEach((el) => el.classList.remove("active"));
+
+      // add active to clicked button
+      item.classList.add("active");
+
+      // get filter value
+      const filterValue = item.getAttribute("data-filter");
+
+      // apply filter in Isotope
+      iso.arrange({ filter: filterValue });
     });
+  });
 
-    document.querySelectorAll(".filters ul li").forEach((item) => {
-      item.addEventListener("click", () => {
-        document
-          .querySelectorAll(".filters ul li")
-          .forEach((el) => el.classList.remove("active"));
-
-        item.classList.add("active");
-
-        const filterValue = item.getAttribute("data-filter");
-        iso.arrange({ filter: filterValue });
-      });
-    });
-  }
-});
+}); */
 
 
+/* =========================
+   ACCORDION
+========================= */
 /* =========================
    ACCORDION
 ========================= */
@@ -81,7 +93,7 @@ document.querySelectorAll(".accordions").forEach((accordion) => {
 
 
 /* =========================
-   OWL CAROUSEL (still jQuery plugin internally)
+   OWL CAROUSEL (still jQuery plugin)
 ========================= */
 window.addEventListener("load", () => {
   if (window.$ && $(".owl-service-item").owlCarousel) {
@@ -119,7 +131,7 @@ window.addEventListener("load", () => {
 
 
 /* =========================
-   MOBILE MENU TOGGLE
+   MOBILE MENU
 ========================= */
 const menuTrigger = document.querySelector(".menu-trigger");
 const navMenu = document.querySelector(".header-area .nav");
@@ -128,11 +140,8 @@ if (menuTrigger && navMenu) {
   menuTrigger.addEventListener("click", () => {
     menuTrigger.classList.toggle("active");
 
-    if (navMenu.style.display === "block") {
-      navMenu.style.display = "none";
-    } else {
-      navMenu.style.display = "block";
-    }
+    navMenu.style.display =
+      navMenu.style.display === "block" ? "none" : "block";
   });
 }
 
@@ -142,8 +151,7 @@ if (menuTrigger && navMenu) {
 ========================= */
 document.querySelectorAll("a[href^='#']").forEach((link) => {
   link.addEventListener("click", (e) => {
-    const targetId = link.getAttribute("href");
-    const target = document.querySelector(targetId);
+    const target = document.querySelector(link.getAttribute("href"));
 
     if (!target) return;
 
@@ -171,23 +179,21 @@ window.addEventListener("scroll", () => {
     const top = target.offsetTop - 100;
     const bottom = top + target.offsetHeight;
 
-    if (scrollPos >= top && scrollPos < bottom) {
-      document
-        .querySelectorAll(".nav a")
-        .forEach((a) => a.classList.remove("active"));
-
-      link.classList.add("active");
-    }
+    link.classList.toggle(
+      "active",
+      scrollPos >= top && scrollPos < bottom
+    );
   });
 });
 
 
 /* =========================
-   COUNT ANIMATION
+   COUNTER ANIMATION
 ========================= */
 function animateCounter(el) {
-  const end = parseInt(el.innerText);
+  const end = parseInt(el.textContent);
   let start = 0;
+
   const duration = 3000;
   const step = 10;
   const increment = end / (duration / step);
@@ -196,10 +202,10 @@ function animateCounter(el) {
     start += increment;
 
     if (start >= end) {
-      el.innerText = end;
+      el.textContent = end;
       clearInterval(timer);
     } else {
-      el.innerText = Math.ceil(start);
+      el.textContent = Math.ceil(start);
     }
   }, step);
 }
@@ -208,10 +214,7 @@ window.addEventListener("scroll", () => {
   document.querySelectorAll(".count-digit").forEach((el) => {
     const rect = el.getBoundingClientRect();
 
-    if (
-      rect.top < window.innerHeight &&
-      !el.classList.contains("done")
-    ) {
+    if (rect.top < window.innerHeight && !el.classList.contains("done")) {
       el.classList.add("done");
       animateCounter(el);
     }
@@ -225,11 +228,11 @@ window.addEventListener("scroll", () => {
 window.addEventListener("load", () => {
   const preloader = document.getElementById("preloader");
 
-  if (preloader) {
-    preloader.style.opacity = "0";
+  if (!preloader) return;
 
-    setTimeout(() => {
-      preloader.style.display = "none";
-    }, 600);
-  }
+  preloader.style.opacity = "0";
+
+  setTimeout(() => {
+    preloader.style.display = "none";
+  }, 600);
 });
